@@ -5,7 +5,8 @@
 # Move update script to prepare_files_v*.sh
 # Remove local download table. Use separate local script for this.
 
-cd /diskmnt/primary/Spatial_Transcriptomics/spaceranger_tools/FFPE/
+cd "../"
+#cd /diskmnt/primary/Spatial_Transcriptomics/spaceranger_tools/FFPE/
 echo "This script turn spacranger table into scripts for spaceranger runs scripts"
 SP_TABLE="table/spaceranger_table_ffpe.tsv"
 SP_SCRIPT="script/out/spaceranger_scripts_ffpe.txt"

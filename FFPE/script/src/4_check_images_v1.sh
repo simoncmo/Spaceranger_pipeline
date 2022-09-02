@@ -1,5 +1,7 @@
 echo "This script check if all image files exist"
-cd /diskmnt/primary/Spatial_Transcriptomics/spaceranger_tools/FFPE/
+echo "If no MISSING message, everything looks good!"
+cd "../"
+#cd /diskmnt/primary/Spatial_Transcriptomics/spaceranger_tools/FFPE/
 SP_TABLE="table/spaceranger_table_ffpe.tsv"
 IMG_CHECK="check_img.txt"
 

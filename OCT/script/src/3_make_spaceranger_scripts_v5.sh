@@ -5,7 +5,8 @@
 # Move update script to prepare_files_v*.sh
 # Remove local download table. Use separate local script for this.
 
-cd /diskmnt/primary/Spatial_Transcriptomics/spaceranger_tools/OCT/
+#cd /diskmnt/primary/Spatial_Transcriptomics/spaceranger_tools/OCT/
+cd '../' 
 echo "This script turn spacranger table into scripts for spaceranger runs scripts"
 SP_TABLE="table/spaceranger_table_oct.tsv"
 SP_SCRIPT="script/out/spaceranger_scripts_oct.txt"
