@@ -20,7 +20,6 @@ awk -F$"\t" 'NR>1 {case_id=$9; sample_id=$3; library_name=$7;
                 printf("spaceranger count --id=%s ",sample_id)
 		printf("--sample=%s ", library_name)
                 printf("--transcriptome=%s " ,transcriptome)
-		printf("--probe-set=%s ", probe_set)
                 printf("--fastqs=%s " ,fastq_path)
                 printf("--image=%s ", image_path)
                 printf("--slide=%s --area=%s ", slide, area)
