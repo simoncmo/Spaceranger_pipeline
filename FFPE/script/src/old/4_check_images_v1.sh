@@ -2,7 +2,7 @@ echo "This script check if all image files exist"
 echo "If no MISSING all showing EXIST then everything correct!"
 #cd /diskmnt/primary/Spatial_Transcriptomics/spaceranger_tools/OCT/
 cd '../'
-SP_TABLE="table/spaceranger_table_oct.tsv"
+SP_TABLE="table/spaceranger_table_ffpe.tsv"
 IMG_CHECK="check_img.txt"
 
 awk -F$"\t" 'NR>1 {image_path=$16; progress_status=$21;
