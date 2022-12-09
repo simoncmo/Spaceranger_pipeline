@@ -13,7 +13,7 @@ setwd('/diskmnt/primary/Spatial_Transcriptomics/Spaceranger_pipeline/FFPE/script
 
 # Load sheet
 gs4_deauth()
-ffpe = "https://docs.google.com/spreadsheets/d/1MtpHNrTdxi9WMyS85FJi0i0yvaPLu0dh3n6Z2RM79nU/edit?usp=sharing"
+ffpe = "https://docs.google.com/spreadsheets/d/1Sg-k6NVnyQWjhdBhbtSPjiRQcntiRVKQNGz69eCASgE/edit#gid=579866082"
 ffpe_sheet = read_sheet(ffpe)
 
 
@@ -34,9 +34,13 @@ samplemap_clean_all = map(globus_ids, function(id){
 # Select and fuzzy
 tracking_sheet_library_col = 'Library Name'
 sheet_select = ffpe_sheet %>% filter(progress_status == 'Running') %>% # might consider not using 'Running as filter in the future'
-	filter(is.na(.data[[tracking_sheet_sample_col]])) %>% # filter row where there's no sample name
+# Need to rething this step. Current workflow use Script to grab Library ID from trackingsheet. Might not input this in google sheet in future version?
+#	filter(is.na(.data[[tracking_sheet_sample_col]])) %>% # filter row where there's no sample name
 	select(-.data[[tracking_sheet_sample_col]]) %>% # remove this column to avoid conflict when merge
 	dplyr::rename({{tracking_sheet_library_col}} := `Library Name`)
+
+# fail save: 
+if(nrow(sheet_select)==0) stop('No sample left to process! Check if setting progress_status = Running, and the filtering script above this line')
 
 # Join table
 by_term = c(setNames(tracking_sheet_library_col, tracking_sheet_sample_col))
@@ -46,15 +50,18 @@ joined_table = regex_inner_join(samplemap_clean_all, sheet_select,
 
 # save
 write_tsv(joined_table, 'out/updated_trackingsheet.tsv')
+dir.create(str_glue('../log/{Sys.Date()}/'))
+write_tsv(joined_table, str_glue('../log/{Sys.Date()}/updated_trackingsheet.tsv'))
+
 
 ############################
 # 2nd: Make script
 ############################
 # Ref: https://stackoverflow.com/questions/2470248/write-lines-of-text-to-a-file-in-r
-scripts_out = pmap(joined_table, function(case_id, piece_id, `sample(from MGI Samplemap.csv, library name)`,
+scripts_out = pmap(joined_table, function(species, case_id, piece_id, `sample(from MGI Samplemap.csv, library name)`,
     `Library Name`, transcriptomome, probe_set, fastqs, image_path, slide, area,
     ...){
-    output_folder = str_c("/diskmnt/Datasets/Spatial_Transcriptomics/outputs_FFPE/",case_id,"/",piece_id)
+    output_folder = str_c("/diskmnt/Datasets/Spatial_Transcriptomics/outputs_FFPE/",species,"/",case_id,"/",piece_id)
     sample_id = `sample(from MGI Samplemap.csv, library name)`
     library_name = `Library Name`
     transcriptome = transcriptomome
@@ -76,12 +83,17 @@ scripts_out = pmap(joined_table, function(case_id, piece_id, `sample(from MGI Sa
     "--localmem=150", collapse = "")
 }) %>% unlist
 
+# Save
 out_file = 'out/spaceranger_scripts_ffpe.txt'
 fileConn<-file(out_file)
 writeLines(scripts_out, con = fileConn)
 close(fileConn)
+# Log
+out_file = str_glue('../log/{Sys.Date()}/spaceranger_scripts_ffpe.txt')
+fileConn<-file(out_file)
+writeLines(scripts_out, con = fileConn)
+close(fileConn)
 message(str_glue('Script saved to {out_file}'))
-
 
 ############################
 # 2.1 th: Echo Image vs Library pair just to make sure
